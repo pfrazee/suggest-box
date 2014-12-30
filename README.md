@@ -35,7 +35,7 @@ You must add your own styles to the page. Here is a some recommended styling in 
 
 ```css
 .suggest-box {
-  position: absolute;
+  position: fixed;
   border: 1px solid #ddd;
   z-index: 100;
   background: white;
