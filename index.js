@@ -87,40 +87,58 @@ function oninput(e) {
 
   // filter and order the list by the current word
   this.selection = 0
-  this.filtered = []
-  for (var i=0; i < options.length; i++) {
-    var opt = options[i]
-    var title = opt.title.indexOf(word)
-    var subtitle = opt.subtitle ? opt.subtitle.indexOf(word) : -1
-    var rank = (title === -1 ? subtitle : (subtitle === -1 ? title : Math.min(title, subtitle)))
-    if(rank > -1) {
-      opt.rank = rank
-      this.filtered.push(opt)
+
+  //request data for this query.
+
+  if(Array.isArray(options)) {
+    this.filtered = options.map(function (opt, i) {
+      var title = opt.title.indexOf(word)
+      var subtitle = opt.subtitle ? opt.subtitle.indexOf(word) : -1
+      var rank = (title === -1 ? subtitle : (subtitle === -1 ? title : Math.min(title, subtitle)))
+      if(rank > -1) {
+        opt.rank = rank
+        return opt
+      }
+    }).filter(Boolean).slice(0, 20)
+    next()
+  }
+  else if('function'  === typeof options) {
+    var self = this
+    var r = this.request = (this.request || 0) + 1
+    options(word, function (err, ary) {
+      //if there has been another request since this was made
+      //but they came back in another order, just drop this one.
+      if(r != self.request) return
+      if(err) console.error(err)
+      else self.filtered = ary
+      next()
+    })
+  }
+
+  function next () {
+    // cancel if there's nothing available
+    if (self.filtered.length == 0)
+      return this.deactivate()
+
+    // create / update the element
+    if (self.active) {
+      self.update()
+    } else {
+      // calculate position
+      var pos = textareaCaretPosition(e.target, i)
+      var rects = e.target.getClientRects()
+      pos.left += rects[0].left
+      pos.top += rects[0].top + 20
+
+      // setup
+      self.x = pos.left
+      self.y = pos.top
+      self.activate()
     }
   }
 
-  this.filtered = this.filtered.sort(compare).slice(0, 20)
-
-  // cancel if there's nothing available
-  if (this.filtered.length == 0)
-    return this.deactivate()
-
-  // create / update the element
-  if (this.active) {
-    this.update()
-  } else {
-    // calculate position
-    var pos = textareaCaretPosition(e.target, i)
-    var rects = e.target.getClientRects()
-    pos.left += rects[0].left
-    pos.top += rects[0].top + 20
-
-    // setup
-    this.x = pos.left
-    this.y = pos.top
-    this.activate()
-  }
 }
+
 
 function compare(a, b) {
   return compareval(a.rank, b.rank) || compareval(a.title, b.title)
