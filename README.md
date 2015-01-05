@@ -29,6 +29,18 @@ suggestBox(textarea, {
 
 This example will watch for the '@' symbol and begin suggesting usernames (bob or alice).
 
+Also, the option may be provided as an async function, this should
+callback with an array of objects with this shape: `{title, subtitle?, value}`
+
+``` js
+suggestBox(textarea, {
+  '@': function (word, cb) {
+    getSuggestion(word, cb)
+  }
+})
+
+```
+
 ## Styles
 
 You must add your own styles to the page. Here is a some recommended styling in less:
