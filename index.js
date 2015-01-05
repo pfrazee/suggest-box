@@ -29,7 +29,7 @@ function renderOpts(box) {
     var tag = 'li'
     if (i === box.selection) tag += '.selected'
     var title = opt.image ? h('img', { src: opt.image }) : h('strong', opt.title)
-    fragment.appendChild(h(tag, [title, ' ', h('small', opt.subtitle)]))
+    fragment.appendChild(h(tag, [title, ' ', opt.subtitle && h('small', opt.subtitle)]))
   }
   return fragment
 }
@@ -91,7 +91,7 @@ function oninput(e) {
   for (var i=0; i < options.length; i++) {
     var opt = options[i]
     var title = opt.title.indexOf(word)
-    var subtitle = opt.subtitle.indexOf(word)
+    var subtitle = opt.subtitle ? opt.subtitle.indexOf(word) : -1
     var rank = (title === -1 ? subtitle : (subtitle === -1 ? title : Math.min(title, subtitle)))
     if(rank > -1) {
       opt.rank = rank
