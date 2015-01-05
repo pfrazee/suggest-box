@@ -11,5 +11,12 @@
     "hyperscript": "~1.4.2"
   },
   "author": "Paul Frazee <pfrazee@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "indexhtmlify": "~1.2.0",
+    "browserify": "~8.0.3"
+  },
+  "scripts": {
+    "build": "browserify example/index.js | indexhtmlify > example/index.html"
+  }
 }
