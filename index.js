@@ -86,8 +86,6 @@ function oninput(e) {
   if(!word)
     return this.deactivate()
 
-  console.log(word, i)
-
   // filter and order the list by the current word
   this.selection = 0
 
