@@ -60,6 +60,7 @@ function deactivate() {
 
 function oninput(e) {
   var options
+  var self = this
 
   // are we in a word that starts with one of the starting characters?
   var v = e.target.value
@@ -85,6 +86,8 @@ function oninput(e) {
   if(!word)
     return this.deactivate()
 
+  console.log(word, i)
+
   // filter and order the list by the current word
   this.selection = 0
 
@@ -103,7 +106,6 @@ function oninput(e) {
     next()
   }
   else if('function'  === typeof options) {
-    var self = this
     var r = this.request = (this.request || 0) + 1
     options(word, function (err, ary) {
       //if there has been another request since this was made
@@ -118,7 +120,7 @@ function oninput(e) {
   function next () {
     // cancel if there's nothing available
     if (self.filtered.length == 0)
-      return this.deactivate()
+      return self.deactivate()
 
     // create / update the element
     if (self.active) {
