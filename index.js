@@ -176,6 +176,9 @@ function onkeydown(e) {
       if (this.filtered.length) {
         var choice = this.filtered[sel]
         if (choice && choice.value) {
+          if (choice.callback) {
+            choice.callback()
+          }
           // update the text under the cursor to have the current selection's value
           var v = e.target.value
           var start = e.target.selectionStart

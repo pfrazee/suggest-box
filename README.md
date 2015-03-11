@@ -15,8 +15,11 @@ suggestBox(textarea, {
     {
       title: 'Bob',              // title to render
       // image: '/img/user.png', // alternative to title, shows the image instead
-      subtitle: 'Bob Roberts'    // subtitle to render
-      value: 'bob'               // value to insert (after the initial character) once selected
+      subtitle: 'Bob Roberts',   // subtitle to render
+      value: 'bob',              // value to insert (after the initial character) once selected
+      callback: function () {    // optional callback function triggered on selection
+        /** code **/
+      }
     },
     {
       title: 'Alice',
