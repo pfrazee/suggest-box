@@ -2,13 +2,14 @@
 var h = require('hyperscript')
 var wordBoundary = /\s/
 
-module.exports = function(el, options) {
+module.exports = function(el, options, callback) {
   var box = {
     options: options,
     active: false,
     activate: activate,
     deactivate: deactivate,
-    update: update
+    update: update,
+    callback: callback
   }
   el.addEventListener('input', oninput.bind(box))
   el.addEventListener('keydown', onkeydown.bind(box))
@@ -176,6 +177,9 @@ function onkeydown(e) {
       if (this.filtered.length) {
         var choice = this.filtered[sel]
         if (choice && choice.value) {
+          if (this.callback && typeof this.callback === 'function') {
+            this.callback(choice)
+          }
           // update the text under the cursor to have the current selection's value
           var v = e.target.value
           var start = e.target.selectionStart
