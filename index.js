@@ -188,7 +188,8 @@ function onkeydown(e) {
             if (wordBoundary.test(v.charAt(end)))
               break
           }
-          e.target.value = v.slice(0, start + 1) + choice.value + ' ' + v.slice(end)
+          e.target.value = v.slice(0, start + 1) + choice.value + v.slice(end)
+          e.target.selectionStart = e.target.selectionEnd = start + choice.value.length + 1
           // fire the change event
           //fireEvent(e.target, 'change')
         }
