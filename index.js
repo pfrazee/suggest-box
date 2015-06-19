@@ -193,8 +193,8 @@ function onkeydown(e) {
           }
           e.target.value = v.slice(0, start + 1) + choice.value + v.slice(end)
           e.target.selectionStart = e.target.selectionEnd = start + choice.value.length + 1
-          // fire the change event
-          //fireEvent(e.target, 'change')
+          // fire the suggestselect event
+          e.target.dispatchEvent(new CustomEvent('suggestselect', { detail: choice }))
         }
       }
       this.deactivate()

@@ -58,7 +58,18 @@ suggestBox(textarea, {
     getSuggestion(word, cb)
   }
 })
+```
 
+If you want to listen for a suggest-box selection, you can attach to the 'suggestselect' event on the element. It will include the option object in the `detail`.
+
+```js
+textarea.addEventListener('suggestselect', function (e) {
+  console.log(e) /* => {
+    title: 'Bob',
+    subtitle: 'Bob Roberts',
+    value: 'bob'
+  } */
+})
 ```
 
 ## Styles
