@@ -14,7 +14,8 @@ suggestBox(textarea, {
   '@': [ // the initial character to watch for
     {
       title: 'Bob',              // title to render
-      // image: '/img/user.png', // alternative to title, shows the image instead
+      // image: '/img/user.png', // optional, renders the image instead of the title (title still required for matching)
+      // cls: 'user-option',     // optional, extra class for the option's li
       subtitle: 'Bob Roberts'    // subtitle to render
       value: 'bob'               // value to insert (after the initial character) once selected
     },
@@ -24,6 +25,8 @@ suggestBox(textarea, {
       value: 'alice'
     }
   ]
+}, {
+  cls: 'my-suggest-box' // optional, extra class for the suggest-box popup
 })
 ```
 

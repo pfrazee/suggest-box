@@ -2,9 +2,10 @@
 var h = require('hyperscript')
 var wordBoundary = /\s/
 
-module.exports = function(el, options) {
+module.exports = function(el, choices, options) {
   var box = {
-    options: options,
+    choices: choices,
+    options: options || {},
     active: false,
     activate: activate,
     deactivate: deactivate,
@@ -17,7 +18,8 @@ module.exports = function(el, options) {
 }
 
 function render(box) {
-  return h('.suggest-box', { style: { left: (box.x+'px'), top: (box.y+'px') } }, [
+  var cls = (box.options.cls) ? ('.'+box.options.cls) : ''
+  return h('.suggest-box'+cls, { style: { left: (box.x+'px'), top: (box.y+'px') } }, [
     h('ul', renderOpts(box))
   ])
 }
@@ -28,6 +30,7 @@ function renderOpts(box) {
     var opt = box.filtered[i]
     var tag = 'li'
     if (i === box.selection) tag += '.selected'
+    if (opt.cls) tag += '.' + opt.cls
     var title = opt.image ? h('img', { src: opt.image }) : h('strong', opt.title)
     fragment.appendChild(h(tag, [title, ' ', opt.subtitle && h('small', opt.subtitle)]))
   }
@@ -59,7 +62,7 @@ function deactivate() {
 }
 
 function oninput(e) {
-  var options
+  var choices
   var self = this
 
   // are we in a word that starts with one of the starting characters?
@@ -73,9 +76,9 @@ function oninput(e) {
     if (wordBoundary.test(c))
       return this.deactivate()
     // hit a starting character?
-    if ((c in this.options || this.options.any) && (i === 0 || wordBoundary.test(v.charAt(i - 1)))) {
-      options = this.options[c] || this.options.any
-      if (options == this.options.any)
+    if ((c in this.choices || this.choices.any) && (i === 0 || wordBoundary.test(v.charAt(i - 1)))) {
+      choices = this.choices[c] || this.choices.any
+      if (choices == this.choices.any)
         isany = true
       break
     }
@@ -94,8 +97,8 @@ function oninput(e) {
 
   //request data for this query.
 
-  if(Array.isArray(options)) {
-    this.filtered = options.map(function (opt, i) {
+  if(Array.isArray(choices)) {
+    this.filtered = choices.map(function (opt, i) {
       var title = opt.title.indexOf(word)
       var subtitle = opt.subtitle ? opt.subtitle.indexOf(word) : -1
       var rank = (title === -1 ? subtitle : (subtitle === -1 ? title : Math.min(title, subtitle)))
@@ -106,9 +109,9 @@ function oninput(e) {
     }).filter(Boolean).slice(0, 20)
     next()
   }
-  else if('function'  === typeof options) {
+  else if('function'  === typeof choices) {
     var r = this.request = (this.request || 0) + 1
-    options(word, function (err, ary) {
+    choices(word, function (err, ary) {
       //if there has been another request since this was made
       //but they came back in another order, just drop this one.
       if(r != self.request) return
@@ -184,7 +187,7 @@ function onkeydown(e) {
           var start = e.target.selectionStart
           var end = start
           for (start; start >= 0; start--) {
-            if (v.charAt(start) in this.options)
+            if (v.charAt(start) in this.choices)
               break
           }
           for (end; end < v.length; end++) {
