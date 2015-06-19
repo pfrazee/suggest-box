@@ -29,6 +29,26 @@ suggestBox(textarea, {
 
 This example will watch for the '@' symbol and begin suggesting usernames (bob or alice).
 
+Alternatively, if you want all inputs to trigger the suggest-box, you can use the 'any' key. This is good for, for example, tag inputs:
+
+```js
+var input = document.querySelector('input.my-tags-input')
+suggestBox(input, {
+  any: [ // trigger for any character
+    {
+      title: 'Bob',
+      subtitle: 'Bob Roberts'
+      value: 'bob'
+    },
+    {
+      title: 'Alice',
+      subtitle: 'Alice Allison',
+      value: 'alice'
+    }
+  ]
+})
+```
+
 Also, the option may be provided as an async function, this should
 callback with an array of objects with this shape: `{title, subtitle?, value}`
 

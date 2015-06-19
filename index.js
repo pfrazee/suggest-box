@@ -63,6 +63,7 @@ function oninput(e) {
   var self = this
 
   // are we in a word that starts with one of the starting characters?
+  var isany = false
   var v = e.target.value
   var i = e.target.selectionStart - 1
   // seek backwards from the cursor
@@ -72,8 +73,10 @@ function oninput(e) {
     if (wordBoundary.test(c))
       return this.deactivate()
     // hit a starting character?
-    if (c in this.options && (i === 0 || wordBoundary.test(v.charAt(i - 1)))) {
-      options = this.options[c]
+    if ((c in this.options || this.options.any) && (i === 0 || wordBoundary.test(v.charAt(i - 1)))) {
+      options = this.options[c] || this.options.any
+      if (options == this.options.any)
+        isany = true
       break
     }
   }
@@ -82,7 +85,7 @@ function oninput(e) {
     return this.deactivate()
 
   // extract current word
-  var word = v.slice(i+1, e.target.selectionStart)
+  var word = v.slice(i+(isany?0:1), e.target.selectionStart)
   if(!word)
     return this.deactivate()
 
