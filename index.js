@@ -98,11 +98,12 @@ function oninput(e) {
   //request data for this query.
 
   if(Array.isArray(choices)) {
+    var wordRe = new RegExp(word, 'i')
     this.filtered = choices.map(function (opt, i) {
-      var title = opt.title.indexOf(word)
-      var subtitle = opt.subtitle ? opt.subtitle.indexOf(word) : -1
-      var rank = (title === -1 ? subtitle : (subtitle === -1 ? title : Math.min(title, subtitle)))
-      if(rank > -1) {
+      var title = wordRe.exec(opt.title)
+      var subtitle = opt.subtitle ? wordRe.exec(opt.subtitle) : null
+      var rank = (title === null ? (subtitle&&subtitle.index) : (subtitle === null ? (title&&title.index) : Math.min(title.index, subtitle.index)))
+      if (rank !== null) {
         opt.rank = rank
         return opt
       }
