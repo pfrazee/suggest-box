@@ -98,7 +98,7 @@ function oninput(e) {
   //request data for this query.
 
   if(Array.isArray(choices)) {
-    var wordRe = new RegExp(word.replace(/\\/g, '\\\\'), 'i')
+    var wordRe = new RegExp(word.replace(/\W/g, ''), 'i')
     this.filtered = choices.map(function (opt, i) {
       var title = wordRe.exec(opt.title)
       var subtitle = opt.subtitle ? wordRe.exec(opt.subtitle) : null
