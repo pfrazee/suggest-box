@@ -107,7 +107,7 @@ function oninput(e) {
         opt.rank = rank
         return opt
       }
-    }).filter(Boolean).slice(0, 20)
+    }).filter(Boolean).sort(compare)slice(0, 20)
     next()
   }
   else if('function'  === typeof choices) {
