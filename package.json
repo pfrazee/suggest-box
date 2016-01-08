@@ -1,7 +1,7 @@
 {
   "name": "suggest-box",
   "description": "decorates a textarea with GitHub-style suggestion popups (eg for emojis and users)",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "homepage": "https://github.com/pfraze/suggest-box",
   "repository": {
     "type": "git",
