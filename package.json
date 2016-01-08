@@ -8,7 +8,8 @@
     "url": "git://github.com/pfraze/suggest-box.git"
   },
   "dependencies": {
-    "hyperscript": "~1.4.2"
+    "hyperscript": "~1.4.2",
+    "textarea-caret-position": "^0.1.1"
   },
   "author": "Paul Frazee <pfrazee@gmail.com>",
   "license": "MIT",
