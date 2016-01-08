@@ -5,14 +5,20 @@
 var h = require('hyperscript')
 var suggest = require('../')
 
-var textarea = h('textarea')
+var textarea = TA = h('textarea', {rows: 60, columns: 20})
 
-document.body.appendChild(h('style', 
-  '.suggest-box {position: fixed;}'
-+ '.suggest-box .selected {color: red;}'
+document.body.appendChild(h('style',
+  '.suggest-box .selected {color: red;}'
 ))
 
-document.body.appendChild(textarea)
+document.body.appendChild(h('div',
+  h('h1', 'suggestbox test'),
+  textarea,
+  h('p',
+    'type into the text area, and when you type "."',
+    'an autosuggest for DOM properties will be created'
+  )
+))
 
 suggest(textarea, {
   '.': function (word, cb) {
@@ -29,4 +35,5 @@ suggest(textarea, {
       }, ~~(Math.random()*200))
     }
 })
+
 

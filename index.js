@@ -2,6 +2,8 @@
 var h = require('hyperscript')
 var wordBoundary = /\s/
 
+var TextareaCaretPosition = require('textarea-caret-position')
+
 module.exports = function(el, choices, options) {
   var box = {
     choices: choices,
@@ -19,7 +21,7 @@ module.exports = function(el, choices, options) {
 
 function render(box) {
   var cls = (box.options.cls) ? ('.'+box.options.cls) : ''
-  return h('.suggest-box'+cls, { style: { left: (box.x+'px'), top: (box.y+'px') } }, [
+  return h('.suggest-box'+cls, { style: { left: (box.x+'px'), top: (box.y+'px'), position: 'fixed' } }, [
     h('ul', renderOpts(box))
   ])
 }
@@ -132,14 +134,13 @@ function oninput(e) {
       self.update()
     } else {
       // calculate position
-      var pos = textareaCaretPosition(e.target, i)
-      var rects = e.target.getClientRects()
-      pos.left += rects[0].left
-      pos.top += rects[0].top + 20
+      var pos = new TextareaCaretPosition(e.target)
+        .get(e.target.selectionStart, e.target.selectionEnd)
 
+      var bounds = e.target.getBoundingClientRect()
       // setup
-      self.x = pos.left
-      self.y = pos.top
+      self.x = pos.left + bounds.left - e.target.scrollLeft
+      self.y = pos.top + bounds.top - e.target.scrollTop + 20
       self.activate()
     }
   }
@@ -210,105 +211,8 @@ function onblur(e) {
   this.deactivate()
 }
 
-// https://github.com/component/textarea-caret-position
-// MIT Licensed, Copyright (c) 2014 Jonathan Ong me@jongleberry.com
 
-// The properties that we copy into a mirrored div.
-// Note that some browsers, such as Firefox,
-// do not concatenate properties, i.e. padding-top, bottom etc. -> padding,
-// so we have to do every single property specifically.
-var properties = [
-  'direction',  // RTL support
-  'boxSizing',
-  'width',  // on Chrome and IE, exclude the scrollbar, so the mirror div wraps exactly as the textarea does
-  'height',
-  'overflowX',
-  'overflowY',  // copy the scrollbar for IE
 
-  'borderTopWidth',
-  'borderRightWidth',
-  'borderBottomWidth',
-  'borderLeftWidth',
 
-  'paddingTop',
-  'paddingRight',
-  'paddingBottom',
-  'paddingLeft',
 
-  // https://developer.mozilla.org/en-US/docs/Web/CSS/font
-  'fontStyle',
-  'fontVariant',
-  'fontWeight',
-  'fontStretch',
-  'fontSize',
-  'fontSizeAdjust',
-  'lineHeight',
-  'fontFamily',
 
-  'textAlign',
-  'textTransform',
-  'textIndent',
-  'textDecoration',  // might not make a difference, but better be safe
-
-  'letterSpacing',
-  'wordSpacing'
-];
-
-var isFirefox = !(window.mozInnerScreenX == null);
-
-function textareaCaretPosition(element, position) {
-  // mirrored div
-  var div = document.createElement('div');
-  div.id = 'input-textarea-caret-position-mirror-div';
-  document.body.appendChild(div);
-
-  var style = div.style;
-  var computed = window.getComputedStyle? getComputedStyle(element) : element.currentStyle;  // currentStyle for IE < 9
-
-  // default textarea styles
-  style.whiteSpace = 'pre-wrap';
-  if (element.nodeName !== 'INPUT')
-    style.wordWrap = 'break-word';  // only for textarea-s
-
-  // position off-screen
-  style.position = 'absolute';  // required to return coordinates properly
-  style.visibility = 'hidden';  // not 'display: none' because we want rendering
-
-  // transfer the element's properties to the div
-  for (var i=0; i < properties.length; i++) {
-    var prop = properties[i]
-    style[prop] = computed[prop]
-  }
-
-  if (isFirefox) {
-    style.width = parseInt(computed.width) - 2 + 'px'  // Firefox adds 2 pixels to the padding - https://bugzilla.mozilla.org/show_bug.cgi?id=753662
-    // Firefox lies about the overflow property for textareas: https://bugzilla.mozilla.org/show_bug.cgi?id=984275
-    if (element.scrollHeight > parseInt(computed.height))
-      style.overflowY = 'scroll';
-  } else {
-    style.overflow = 'hidden';  // for Chrome to not render a scrollbar; IE keeps overflowY = 'scroll'
-  }  
-
-  div.textContent = element.value.substring(0, position);
-  // the second special handling for input type="text" vs textarea: spaces need to be replaced with non-breaking spaces - http://stackoverflow.com/a/13402035/1269037
-  if (element.nodeName === 'INPUT')
-    div.textContent = div.textContent.replace(/\s/g, "\u00a0");
-
-  var span = document.createElement('span');
-  // Wrapping must be replicated *exactly*, including when a long word gets
-  // onto the next line, with whitespace at the end of the line before (#7).
-  // The  *only* reliable way to do that is to copy the *entire* rest of the
-  // textarea's content into the <span> created at the caret position.
-  // for inputs, just '.' would be enough, but why bother?
-  span.textContent = element.value.substring(position) || '.';  // || because a completely empty faux span doesn't render at all
-  div.appendChild(span);
-
-  var coordinates = {
-    top: span.offsetTop + parseInt(computed['borderTopWidth']),
-    left: span.offsetLeft + parseInt(computed['borderLeftWidth'])
-  };
-
-  document.body.removeChild(div);
-
-  return coordinates;
-}
