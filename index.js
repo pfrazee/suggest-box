@@ -6,12 +6,14 @@ var TextareaCaretPosition = require('textarea-caret-position')
 
 module.exports = function(el, choices, options) {
   var box = {
+    input: el,
     choices: choices,
     options: options || {},
     active: false,
     activate: activate,
     deactivate: deactivate,
-    update: update
+    update: update,
+    complete: complete,
   }
   el.addEventListener('input', oninput.bind(box))
   el.addEventListener('keydown', onkeydown.bind(box))
@@ -19,10 +21,46 @@ module.exports = function(el, choices, options) {
   return box
 }
 
+function getItemIndex(e) {
+  for (var el = e.target; el && el != this; el = el.parentNode)
+    if (el._i != null)
+      return el._i
+}
+
+function onListMouseMove(e) {
+  this._box.isMouseActive = true
+}
+
+function onListMouseOver(e) {
+  // ignore mouseover triggered by list redrawn under the cursor
+  if (!this._box.isMouseActive) return
+
+  var i = getItemIndex(e)
+  if (i != null && i != this._box.selection) {
+    this._box.selection = i
+    this._box.update()
+  }
+}
+
+function onListMouseDown(e) {
+  var i = getItemIndex(e)
+  if (i != null) {
+    this._box.selection = i
+    this._box.complete()
+    // prevent blur
+    e.preventDefault()
+  }
+}
+
 function render(box) {
   var cls = (box.options.cls) ? ('.'+box.options.cls) : ''
   return h('.suggest-box'+cls, { style: { left: (box.x+'px'), top: (box.y+'px'), position: 'fixed' } }, [
-    h('ul', renderOpts(box))
+    h('ul', {
+      _box: box,
+      onmousemove: onListMouseMove,
+      onmouseover: onListMouseOver,
+      onmousedown: onListMouseDown
+    }, renderOpts(box))
   ])
 }
 
@@ -34,7 +72,7 @@ function renderOpts(box) {
     if (i === box.selection) tag += '.selected'
     if (opt.cls) tag += '.' + opt.cls
     var title = opt.image ? h('img', { src: opt.image }) : h('strong', opt.title)
-    fragment.appendChild(h(tag, [title, ' ', opt.subtitle && h('small', opt.subtitle)]))
+    fragment.appendChild(h(tag, {_i: i}, [title, ' ', opt.subtitle && h('small', opt.subtitle)]))
   }
   return fragment
 }
@@ -159,19 +197,20 @@ function compareval(a, b) {
 function onkeydown(e) {
   if (this.active) {
     var sel = this.selection
+    var len = this.filtered.length
 
     if (e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13 || e.keyCode == 9|| e.keyCode == 27)
       e.preventDefault()
 
     // up
-    if (e.keyCode == 38 && sel > 0) {
-      this.selection = sel - 1
+    if (e.keyCode == 38) {
+      this.selection = (sel - 1 + len) % len
       this.update()
     }
 
     // down
-    if (e.keyCode == 40 && sel < (this.filtered.length - 1)) {
-      this.selection = sel + 1
+    if (e.keyCode == 40) {
+      this.selection = (sel + 1) % len
       this.update()
     }
 
@@ -181,29 +220,10 @@ function onkeydown(e) {
 
     // enter or tab
     if (e.keyCode == 13 || e.keyCode == 9) {
-      if (this.filtered.length) {
-        var choice = this.filtered[sel]
-        if (choice && choice.value) {
-          // update the text under the cursor to have the current selection's value
-          var v = e.target.value
-          var start = e.target.selectionStart
-          var end = start
-          for (start; start >= 0; start--) {
-            if (v.charAt(start) in this.choices)
-              break
-          }
-          for (end; end < v.length; end++) {
-            if (wordBoundary.test(v.charAt(end)))
-              break
-          }
-          e.target.value = v.slice(0, start + 1) + choice.value + v.slice(end)
-          e.target.selectionStart = e.target.selectionEnd = start + choice.value.length + 1
-          // fire the suggestselect event
-          e.target.dispatchEvent(new CustomEvent('suggestselect', { detail: choice }))
-        }
-      }
-      this.deactivate()
+      this.complete()
     }
+
+    this.isMouseActive = false
   }
 }
 
@@ -211,8 +231,25 @@ function onblur(e) {
   this.deactivate()
 }
 
-
-
-
-
-
+function complete() {
+  var choice = this.filtered[this.selection]
+  if (choice && choice.value) {
+    // update the text under the cursor to have the current selection's value
+    var v = this.input.value
+    var start = this.input.selectionStart
+    var end = start
+    for (start; start >= 0; start--) {
+      if (v.charAt(start) in this.choices)
+        break
+    }
+    for (end; end < v.length; end++) {
+      if (wordBoundary.test(v.charAt(end)))
+        break
+    }
+    this.input.value = v.slice(0, start + 1) + choice.value + v.slice(end)
+    this.input.selectionStart = this.input.selectionEnd = start + choice.value.length + 1
+    // fire the suggestselect event
+    this.input.dispatchEvent(new CustomEvent('suggestselect', { detail: choice }))
+  }
+  this.deactivate()
+}
