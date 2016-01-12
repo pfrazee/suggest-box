@@ -159,19 +159,20 @@ function compareval(a, b) {
 function onkeydown(e) {
   if (this.active) {
     var sel = this.selection
+    var len = this.filtered.length
 
     if (e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13 || e.keyCode == 9|| e.keyCode == 27)
       e.preventDefault()
 
     // up
-    if (e.keyCode == 38 && sel > 0) {
-      this.selection = sel - 1
+    if (e.keyCode == 38) {
+      this.selection = (sel - 1 + len) % len
       this.update()
     }
 
     // down
-    if (e.keyCode == 40 && sel < (this.filtered.length - 1)) {
-      this.selection = sel + 1
+    if (e.keyCode == 40) {
+      this.selection = (sel + 1) % len
       this.update()
     }
 
@@ -181,7 +182,7 @@ function onkeydown(e) {
 
     // enter or tab
     if (e.keyCode == 13 || e.keyCode == 9) {
-      if (this.filtered.length) {
+      if (len) {
         var choice = this.filtered[sel]
         if (choice && choice.value) {
           // update the text under the cursor to have the current selection's value
