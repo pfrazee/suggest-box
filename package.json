@@ -14,8 +14,9 @@
   "author": "Paul Frazee <pfrazee@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "browserify": "~8.0.3",
     "indexhtmlify": "~1.2.0",
-    "browserify": "~8.0.3"
+    "tape": "^4.4.0"
   },
   "scripts": {
     "build": "browserify example/index.js | indexhtmlify > example/index.html"
