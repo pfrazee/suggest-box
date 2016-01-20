@@ -27,7 +27,7 @@ suggest(textarea, {
                   .filter(function (k) {
                     return k.toLowerCase().indexOf(word) === 0
                   }).map(function (k) {
-                    return {title: k, value: k}
+                    return {title: k, value: '.'+k}
                   })
 
       setTimeout(function () {
