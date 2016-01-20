@@ -14,6 +14,7 @@ module.exports = function(el, choices, options) {
   var suggest = Suggester(choices)
 
   var box = {
+    input: el,
     choices: choices,
     options: options || {},
     active: false,
@@ -44,20 +45,6 @@ module.exports = function(el, choices, options) {
     },
     prev: function () {
       this.select(this.selection - 1)
-    },
-    update: update,
-    enter: function (n) {
-      if(!isNaN(n)) this.select(n)
-      if (this.filtered.length) {
-        var choice = this.filtered[this.selection]
-        if (choice && choice.value) {
-          // update the text under the cursor to have the current selection's value          var v = el.value
-          this.set(choice.value)
-          // fire the suggestselect event
-          el.dispatchEvent(new CustomEvent('suggestselect', { detail: choice }))
-        }
-      }
-      this.deactivate()
     },
     suggest: function (cb) {
       var choices, self = this
@@ -95,7 +82,21 @@ module.exports = function(el, choices, options) {
         self.y = pos.top + bounds.top - el.scrollTop + 20
         self.activate()
       }
-    }
+    },
+    update: update,
+    complete: function (n) {
+      if(!isNaN(n)) this.select(n)
+      if (this.filtered.length) {
+        var choice = this.filtered[this.selection]
+        if (choice && choice.value) {
+          // update the text under the cursor to have the current selection's value          var v = el.value
+          this.set(choice.value)
+          // fire the suggestselect event
+          el.dispatchEvent(new CustomEvent('suggestselect', { detail: choice }))
+        }
+      }
+      this.deactivate()
+    },
   }
   el.addEventListener('input', oninput.bind(box))
   el.addEventListener('keydown', onkeydown.bind(box))
@@ -103,10 +104,43 @@ module.exports = function(el, choices, options) {
   return box
 }
 
+function getItemIndex(e) {
+  for (var el = e.target; el && el != this; el = el.parentNode)
+    if (el._i != null)
+      return el._i
+}
+
+function onListMouseMove(e) {
+  this.isMouseActive = true
+}
+
+function onListMouseOver(e) {
+  // ignore mouseover triggered by list redrawn under the cursor
+  if (!this.isMouseActive) return
+
+  var i = getItemIndex(e)
+  if (i != null && i != this.selection)
+    this.select(i)
+}
+
+function onListMouseDown(e) {
+  var i = getItemIndex(e)
+  if (i != null) {
+    this.select(i)
+    this.complete()
+    // prevent blur
+    e.preventDefault()
+  }
+}
+
 function render(box) {
   var cls = (box.options.cls) ? ('.'+box.options.cls) : ''
   return h('.suggest-box'+cls, { style: { left: (box.x+'px'), top: (box.y+'px'), position: 'fixed' } }, [
-    h('ul', renderOpts(box))
+    h('ul', {
+      onmousemove: onListMouseMove.bind(box),
+      onmouseover: onListMouseOver.bind(box),
+      onmousedown: onListMouseDown.bind(box)
+    }, renderOpts(box))
   ])
 }
 
@@ -118,7 +152,7 @@ function renderOpts(box) {
     if (i === box.selection) tag += '.selected'
     if (opt.cls) tag += '.' + opt.cls
     var title = opt.image ? h('img', { src: opt.image }) : h('strong', opt.title)
-    fragment.appendChild(h(tag, [title, ' ', opt.subtitle && h('small', opt.subtitle)]))
+    fragment.appendChild(h(tag, {_i: i}, [title, ' ', opt.subtitle && h('small', opt.subtitle)]))
   }
   return fragment
 }
@@ -164,15 +198,33 @@ function onkeydown(e) {
     // escape
     else if (e.keyCode == 27) this.deactivate()
     // enter or tab
-    else if (e.keyCode == 13 || e.keyCode == 9) this.enter()
-    else
-      return //ordinary key, fall back.
+
+    else if (e.keyCode == 13 || e.keyCode == 9) this.complete()
+    else return //ordinary key, fall back.
 
     e.preventDefault() //movement key, as above.
+
+    this.isMouseActive = false
   }
 }
 
 function onblur(e) {
   this.deactivate()
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
