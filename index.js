@@ -184,7 +184,6 @@ function deactivate() {
 function oninput(e) {
   var self = this
   var word = this.suggest(function (_, suggestions) {
-    console.log('SUG', _, suggestions)
     if(suggestions) self.reposition()
   })
 }
@@ -211,6 +210,7 @@ function onkeydown(e) {
 function onblur(e) {
   this.deactivate()
 }
+
 
 
 
