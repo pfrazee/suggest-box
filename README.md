@@ -36,11 +36,23 @@ if there is an error, it will be logged.
 
 ``` js
 {
+    title: 'Bob',              // title to render
+    // image: '/img/user.png', // optional, renders the image instead of the title (title still required for matching)
+    // cls: 'user-option',     // optional, extra class for the option's li
+    subtitle: 'Bob Roberts'    // subtitle to render
+    value: '@bob'              // value to insert once selected
+}
+```
+
+can use `showBoth` to display image and title
+``` js
+{
   title: 'Bob',              // title to render
-  // image: '/img/user.png', // optional, renders the image instead of the title (title still required for matching)
+  image: '/img/user.png',    // renders the image at left of the title
   // cls: 'user-option',     // optional, extra class for the option's li
   subtitle: 'Bob Roberts'    // subtitle to render
   value: '@bob'              // value to insert once selected
+  showBoth: true             // display image + title
 }
 ```
 
@@ -82,7 +94,7 @@ suggestBox(input, [ // trigger for any character
   ]
 )
 ```
-(this also works as 
+(this also works as
 
 Also, the option may be provided as an async function, this should
 callback with an array of objects with this shape: `{title, subtitle?, value}`

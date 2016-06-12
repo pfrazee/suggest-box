@@ -151,8 +151,13 @@ function renderOpts(box) {
     var tag = 'li'
     if (i === box.selection) tag += '.selected'
     if (opt.cls) tag += '.' + opt.cls
-    var title = opt.image ? h('img', { src: opt.image }) : h('strong', opt.title)
-    fragment.appendChild(h(tag, {_i: i}, [title, ' ', opt.subtitle && h('small', opt.subtitle)]))
+    var title = null
+    var image = null
+    if(opt.showBoth){
+        title = h('strong', opt.title)
+        image = h('img', { src: opt.image })
+    } else title = opt.image ? h('img', { src: opt.image }) : h('strong', opt.title)
+    fragment.appendChild(h(tag, {_i: i}, image, ' ', [title, ' ', opt.subtitle && h('small', opt.subtitle)]))
   }
   return fragment
 }
