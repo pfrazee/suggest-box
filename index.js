@@ -13,6 +13,8 @@ module.exports = function(el, choices, options) {
 
   var suggest = Suggester(choices)
 
+  var stringify = options.stringify || String
+
   var box = {
     input: el,
     choices: choices,
@@ -90,7 +92,7 @@ module.exports = function(el, choices, options) {
         var choice = this.filtered[this.selection]
         if (choice && choice.value) {
           // update the text under the cursor to have the current selection's value          var v = el.value
-          this.set(choice.value)
+          this.set(stringify(choice.value))
           // fire the suggestselect event
           el.dispatchEvent(new CustomEvent('suggestselect', { detail: choice }))
         }
@@ -215,21 +217,4 @@ function onkeydown(e) {
 function onblur(e) {
   this.deactivate()
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
