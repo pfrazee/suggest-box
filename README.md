@@ -14,6 +14,10 @@ suggestBox(textarea, suggester, {
   cls: 'my-suggest-box' // optional, extra class for the suggest-box popup
 })
 ```
+### options
+* `cls` additional classes to set on the suggest box. appended to `'.suggestbox'+cls`. see syntax for [hyperscript classes](https://github.com/dominictarr/hyperscript#classes--id)
+* `stringify` a function called to map a selected value to a string. 
+
 
 ## suggestor
 
@@ -43,6 +47,10 @@ if there is an error, it will be logged.
     value: '@bob'              // value to insert once selected
 }
 ```
+
+when an item is selected. the value of the `value` property is inserted at the cursor.
+If `options.stringify` is provided, then `options.stringify(value)` is inserted (which means `.value` may be an object)
+otherwise `value` must be a string.
 
 can use `showBoth` to display image and title
 ``` js
