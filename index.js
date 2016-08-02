@@ -8,17 +8,18 @@ var TextareaCaretPosition = require('textarea-caret-position')
 var Suggester = require('./suggester')
 
 module.exports = function(el, choices, options) {
-
   var tcp = new TextareaCaretPosition(el)
 
   var suggest = Suggester(choices)
 
   var stringify = options.stringify || String
 
+  options = options || {}
+
   var box = {
     input: el,
     choices: choices,
-    options: options || {},
+    options: options,
     active: false,
     activate: activate,
     deactivate: deactivate,
@@ -217,4 +218,5 @@ function onkeydown(e) {
 function onblur(e) {
   this.deactivate()
 }
+
 
