@@ -12,9 +12,9 @@ module.exports = function(el, choices, options) {
 
   var suggest = Suggester(choices)
 
-  var stringify = options.stringify || String
-
   options = options || {}
+
+  var stringify = options.stringify || String
 
   var box = {
     input: el,
@@ -218,5 +218,6 @@ function onkeydown(e) {
 function onblur(e) {
   this.deactivate()
 }
+
 
 
