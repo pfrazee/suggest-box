@@ -180,6 +180,7 @@ function activate() {
   this.active = true
   this.el = render(this)
   document.body.appendChild(this.el)
+  adjustPosition.call(this)
 }
 
 function update() {
@@ -188,6 +189,7 @@ function update() {
   var ul = this.el.querySelector('ul')
   ul.innerHTML = ''
   ul.appendChild(renderOpts(this))
+  adjustPosition.call(this)
 }
 
 function deactivate() {
@@ -228,5 +230,11 @@ function onblur(e) {
   this.deactivate()
 }
 
-
+function adjustPosition() {
+  // move the box left to fit in the viewport, if needed
+  var width = this.el.getBoundingClientRect().width
+  var rightOverflow = this.x + width - window.innerWidth
+  var rightAdjust = Math.min(this.x, Math.max(0, rightOverflow))
+  this.el.style.left = (this.x - rightAdjust) + 'px'
+}
 
