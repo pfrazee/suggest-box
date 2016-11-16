@@ -5,7 +5,9 @@
 var h = require('hyperscript')
 var suggest = require('../')
 
-var textarea = TA = h('textarea', {rows: 60, columns: 20})
+var textarea = TA = h('textarea', {rows: 60, columns: 20,
+  value: '\n'.repeat(55)
+})
 
 document.body.appendChild(h('style',
   '.suggest-box .selected {color: red;}'
@@ -13,6 +15,10 @@ document.body.appendChild(h('style',
 
 document.body.appendChild(h('div',
   h('h1', 'suggestbox test'),
+  h('input', {type: 'checkbox', onclick: function () {
+    this.parentNode.style.textAlign = this.checked ? 'right' : 'left'
+  }}),
+  h('br'),
   textarea,
   h('p',
     'type into the text area, and when you type "."',
