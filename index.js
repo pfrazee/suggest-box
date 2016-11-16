@@ -138,7 +138,16 @@ function onListMouseDown(e) {
 
 function render(box) {
   var cls = (box.options.cls) ? ('.'+box.options.cls) : ''
-  return h('.suggest-box'+cls, { style: { left: (box.x+'px'), top: (box.y+'px'), position: 'fixed' } }, [
+  var style = { left: (box.x+'px'), position: 'fixed' }
+
+  // hang the menu above or below the cursor, wherever there is more room
+  if (box.y < window.innerHeight/2) {
+    style.top = box.y + 'px'
+  } else {
+    style.bottom = (window.innerHeight - box.y + 20) + 'px'
+  }
+
+  return h('.suggest-box'+cls, { style: style }, [
     h('ul', {
       onmousemove: onListMouseMove.bind(box),
       onmouseover: onListMouseOver.bind(box),
