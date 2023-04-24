@@ -16,7 +16,8 @@ suggestBox(textarea, suggester, {
 ```
 ### options
 * `cls` additional classes to set on the suggest box. appended to `'.suggestbox'+cls`. see syntax for [hyperscript classes](https://github.com/dominictarr/hyperscript#classes--id)
-* `stringify` a function called to map a selected value to a string. 
+* `stringify` a function called to map a selected value to a string.
+* `bottom` force rendering on the bottom. 
 
 
 ## suggestor
