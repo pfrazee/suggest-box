@@ -141,7 +141,7 @@ function render(box) {
   var style = { left: (box.x+'px'), position: 'fixed' }
 
   // hang the menu above or below the cursor, wherever there is more room
-  if (box.y < window.innerHeight/2) {
+  if (box.options.bottom || box.y < window.innerHeight/2) {
     style.top = box.y + 'px'
   } else {
     style.bottom = (window.innerHeight - box.y + 20) + 'px'
